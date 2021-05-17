@@ -216,6 +216,10 @@ int main(){
             printf("Usuario: %s\n", userName);
             printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");
             scanf("%d", &option);
+	    if (option != 1 && != 2 && != 3){
+		printf("opcao invalida\n");
+		break;
+	    	}
 
             if(option == 1){
                 system("cls");
