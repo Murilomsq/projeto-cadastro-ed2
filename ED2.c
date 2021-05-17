@@ -164,11 +164,24 @@ int main(){
         if(strstr(state, "logging")){
 
             printf("Deseja fazer login ou cadastrar-se?\nLogin (1)\nCadastro (2)\n");
-            scanf("%d", &option);
-	    if (option != 1 && != 2){
-		printf("opcao invalida\n");
-		break;
-	    	}
+            do
+                {   
+                    scanf("%d", &option);
+
+                    if(option != 1 && option != 2){
+                        system("cls");
+                        printf("Opcao invalida\n\n");
+                        printf("Deseja fazer login ou cadastrar-se?\nLogin (1)\nCadastro (2)\n");
+                    }
+
+                    while(getchar() != '\n'){    
+                        system("cls");
+                        printf("Opcao invalida\n\n");
+                        printf("Deseja fazer login ou cadastrar-se?\nLogin (1)\nCadastro (2)\n");  
+                    } }
+                while (option != 1 && option != 2);
+
+
 		
             if(option == 1){
 
@@ -215,11 +228,22 @@ int main(){
         else if(strstr(state, "logged")){
             printf("Usuario: %s\n", userName);
             printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");
-            scanf("%d", &option);
-	    if (option != 1 && != 2 && != 3){
-		printf("opcao invalida\n");
-		break;
-	    	}
+            do
+                {   
+                    scanf("%d", &option);
+
+                    if(option != 1 && option != 2 && option != 3){
+                        system("cls");
+                        printf("Opcao invalida\n\n");
+                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n"); 
+                    }
+
+                    while(getchar() != '\n'){    
+                        system("cls");
+                        printf("Opcao invalida\n\n");
+                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");    
+                    } }
+                while (option != 1 && option != 2 && option != 3);
 
             if(option == 1){
                 system("cls");
