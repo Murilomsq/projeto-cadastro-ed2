@@ -32,7 +32,7 @@ void ReplaceLineWith(int line, char *fName, char *textToReplace){
     strcpy(newline, newLineCopy);
 
     fPtr  = fopen(fName, "r");
-    fTemp = fopen("replace.tmp", "w");
+    fTemp = fopen("replace.txt", "w");
 
 
     count = 0;
@@ -42,7 +42,7 @@ void ReplaceLineWith(int line, char *fName, char *textToReplace){
 
         /* If current line is line to replace */
         if (count == line)
-            fputs(textToReplace, fTemp);
+            fputs(newLineCopy, fTemp);
         else
             fputs(buffer, fTemp);
     }
@@ -50,14 +50,13 @@ void ReplaceLineWith(int line, char *fName, char *textToReplace){
     fclose(fTemp);
 
     remove(fName);
-    rename("replace.tmp", fName);
+    rename("replace.txt", fName);
 
-    printf("\nSuccessfully replaced '%d' line with '%s'.", line, newline);
 
 
 }
 
-int CheckForUserPassword(char *fname, char *str, char *consoleMessage){
+int CheckForUserPassword(char *fname, char *str, char *consoleMessage, int *line){
 
     char jumpLine[2] = "\n";
     FILE *fp;
@@ -69,18 +68,18 @@ int CheckForUserPassword(char *fname, char *str, char *consoleMessage){
     strcat(str, jumpLine);
 
 	if((fp = fopen(fname, "r")) == NULL) {
-        consoleMessage = "No file found!";
 		return -1;
 	}
 
-	//Pega linha por linha com o fgets e checa se está igual
+	//Pega linha por linha com o fgets e checa se estï¿½ igual
 	while(fgets(temp, 512, fp) != NULL) {
 
 
 
 		if(strcmp(str,temp) == 0) {
             system("cls");
-			printf("User found\nPassword: ");
+            *line = line_num;
+			printf("Usuario encontrado\nSenha: ");
 
 			scanf("%s", password);
 			userFound = 1;
@@ -105,7 +104,7 @@ int CheckForUserPassword(char *fname, char *str, char *consoleMessage){
 	encrypt(password, strlen(password));
 	strcat(password, jumpLine);
 
-
+    fclose(fp);
 
 
     if((strcmp(password, temp)) == 0) {
@@ -115,6 +114,7 @@ int CheckForUserPassword(char *fname, char *str, char *consoleMessage){
         printf("wrong password\n");
         return 1;
     }
+    
 
 }
 
@@ -152,22 +152,12 @@ int Search_in_File(char *fname, char *str) {
         return -1;
 	}
 
-	if(fp) {
-		fclose(fp);
-	}
+	
+	fclose(fp);
+	
    	return 0;
 }
 
-void ChangeLine2Content(char *fName, char *toChange){
-    FILE *fp;
-    fp = fopen(fName, "r+");
-    char temp[50];
-
-        fgets(temp, 50, fp);
-        strcpy(temp, toChange);
-        printf("%s", temp);
-
-}
 
 int PrintInANewLine(char *name, char *str){
 
@@ -177,18 +167,21 @@ int PrintInANewLine(char *name, char *str){
     fclose(fp);
 }
 
-
+#pragma region main
 int main(){
-
-    ReplaceLineWith(2,"Usuarios", "flp");
+    system("cls");
     char consoleMessage[40] = "";
     char state[20] = "logging";
+    int lookingAtLine = 0;
     while(1){
+
         int option = 0;
         char userName[100];
         char jumpLine[2] = "\n";
         char toEncrypt[200];
         printf("%s\n\n", consoleMessage);
+
+
         if(strstr(state, "logging")){
 
             printf("Deseja fazer login ou cadastrar-se?\nLogin (1)\nCadastro (2)\n");
@@ -196,13 +189,19 @@ int main(){
 
 
             if(option == 1){
+
                 system("cls");
                 printf("Digite o nome de usuario: ");
                 scanf("%s", userName);
-                CheckForUserPassword("Usuarios", userName, consoleMessage);
-                strcpy(consoleMessage, "Logado com sucesso");
-                strcpy(state, "logged");
-                system("cls");
+                if(CheckForUserPassword("Usuarios", userName, consoleMessage, &lookingAtLine) == 0){
+                    strcpy(consoleMessage, "Logado com sucesso");
+                    strcpy(state, "logged");
+                    system("cls");
+                }
+                else{
+                    strcpy(consoleMessage, "Usuario ou senha incorretos");
+                    system("cls");
+                }
 
             }
             else if(option == 2){
@@ -219,14 +218,12 @@ int main(){
                 printf("Digite sua senha: ");
                 scanf("%s", toEncrypt);
 
-                char *encryptedCopy;
+                //char *encryptedCopy;
 
                 encrypt(toEncrypt, strlen(toEncrypt));
 
-                encryptedCopy = (char*)malloc(sizeof(char)*strlen(toEncrypt) + 1);
-                for(int i = 0; i < strlen(toEncrypt) + 1; i++){
-                    encryptedCopy[i] = toEncrypt[i];
-                }
+                //encryptedCopy = (char*)malloc(sizeof(char)*strlen(toEncrypt) + 1);
+                //strcpy(encryptedCopy, toEncrypt);
 
                 strcat(toEncrypt, jumpLine);
                 strcat(userName, jumpLine);
@@ -235,13 +232,54 @@ int main(){
                 PrintInANewLine("Usuarios", jumpLine);
 
 
-                printf("Sua senha sera armazenada na forma: %s\n", encryptedCopy);
-                *consoleMessage = "Cadastro concluido";
+                //printf("Sua senha sera armazenada na forma: %s\n", encryptedCopy);
+                strcpy(consoleMessage, "Cadastro concluido!");
+                system("cls");
+
             }
         }
         else if(strstr(state, "logged")){
-            printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)");
+            printf("Usuario: %s\n", userName);
+            printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");
             scanf("%d", &option);
+
+            if(option == 1){
+                system("cls");
+                printf("Qual sera sua nova senha?\n");
+                char newPass[50];
+                scanf("%s", newPass);
+                encrypt(newPass, strlen(newPass));
+                strcat(newPass, jumpLine);
+                ReplaceLineWith(lookingAtLine + 1, "Usuarios", newPass);
+                strcpy(consoleMessage, "Senha alterada com sucesso!");
+                system("cls");
+            } 
+            else if(option == 2){
+                system("cls");
+                printf("Qual sera sua novo nome de usuario?\n");
+                char newUser[50];
+                scanf("%s", newUser);
+                if(Search_in_File("Usuarios", newUser) == 0){
+                    strcpy(consoleMessage, "Usuario ja existe");
+
+                    system("cls");
+                    continue;
+                }
+                
+                ReplaceLineWith(lookingAtLine, "Usuarios", newUser);
+                
+                strcpy(userName, newUser);
+                strcat(userName, jumpLine);
+                strcpy(consoleMessage, "Nome de usuario alterado com sucesso");
+                system("cls");
+            }
+            else if(option == 3){
+                lookingAtLine = 0;
+                strcpy(state, "logging");
+                strcpy(consoleMessage, "Deslogado com sucesso");
+                system("cls");
+            }
+
         }
 
 
@@ -257,4 +295,4 @@ int main(){
 
     return 0;
 }
-
+#pragma endregion
