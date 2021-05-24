@@ -12,6 +12,106 @@ void encrypt(char *array, int array_size)
     }
 }
 
+
+int GetNumberOfUsers(char *fName){
+
+    FILE* fp;
+    int numOfUsers = 0;
+    int nextLineToGet = 1, actualLine = 1;
+    char buffer[50];
+
+    fp = fopen(fName, "r");
+    while(fgets(buffer, 50, fp) != NULL) {
+        
+        if ((actualLine + 3) % 3 == 1){
+            numOfUsers ++;
+        }
+        actualLine ++;
+	}
+    fclose(fp);
+    return numOfUsers;
+
+}
+
+int SortingTextFile(char *fname) {
+    int numOfUsers = GetNumberOfUsers(fname);
+
+    char userNameList[numOfUsers][30];
+    char userPassList[numOfUsers][30];
+    int userArrayAtPos1 = 0, userArrayAtPos2 = 0;
+    char buffer[50];
+    
+
+    FILE * fPtr;
+    FILE * fTemp;
+
+    if((fPtr = fopen(fname, "r")) == NULL) {
+        printf("No file found!");
+ 	    return -1;
+    }
+
+    //Trazendo os usuarios do arquivo de texto para os vetores userNameList e userPassList
+    //---------------------------------------------------------------------------------------------------------------------
+    int nextLineToGet = 1, actualLine = 1;
+    while(fgets(buffer, 512, fPtr) != NULL ) {
+        if ((actualLine + 3) % 3 == 1){
+            strcpy(userNameList[userArrayAtPos1], buffer);
+            userArrayAtPos1 ++;
+            nextLineToGet += 3;
+        }
+
+        else if((actualLine + 3) % 3 == 2){
+            strcpy(userPassList[userArrayAtPos2], buffer);
+            userArrayAtPos2 ++;
+        }
+        actualLine ++;
+	}
+
+
+    //Ordenando os vetores de acordo com seus respectivos nomes de usuarios
+    //----------------------------------------------------------------------------------------------------------------------
+    char tmp[30];
+    int j, i;
+    for (i = 1; i < numOfUsers; i++) {
+        j = i;
+        while (j > 0 && strcmp(userNameList[j - 1], userNameList[j]) > 0 ) {
+            //Mudando o usuario de lugar
+            strcpy(tmp, userNameList[j]);
+            strcpy(userNameList[j], userNameList[j - 1]);
+            strcpy(userNameList[j - 1], tmp);
+
+            //Mudando a senha de lugar
+            strcpy(tmp, userPassList[j]);
+            strcpy(userPassList[j], userPassList[j - 1]);
+            strcpy(userPassList[j - 1], tmp);
+            j--;
+        }
+    }
+    fclose(fPtr);
+
+
+    //________________________________________________________________________________________________________
+    //Confecionando o novo aquivo txt agora com a ordem certa
+
+    fTemp = fopen("replace.txt", "w");
+
+    for(int k = 0; k < numOfUsers; k++){
+        fputs(userNameList[k], fTemp);
+        fputs(userPassList[k], fTemp);
+        fputs("\n", fTemp);
+        
+    }
+    
+
+    fclose(fTemp);
+
+    remove(fname);
+    rename("replace.txt", fname);
+    
+
+    return 0;
+}
+
 void ReplaceLineWith(int line, char *fName, char *textToReplace){
 
     FILE * fPtr;
@@ -48,7 +148,7 @@ void ReplaceLineWith(int line, char *fName, char *textToReplace){
 
     remove(fName);
     rename("replace.txt", fName);
-    }
+}
 
 int CheckForUserPassword(char *fname, char *str, char *consoleMessage, int *line){
 
@@ -116,7 +216,7 @@ int Search_in_File(char *fname, char *str) {
 
     if((fp = fopen(fname, "r")) == NULL) {
         printf("No file found!");
- 	return -1;
+ 	    return -1;
     }
 	
     //Cria uma copia para que o jumpline nao mude a string original parea checagem
@@ -127,14 +227,14 @@ int Search_in_File(char *fname, char *str) {
 
     while(fgets(temp, 512, fp) != NULL) {
         if((strcmp(temp, strCopy)) == NULL) {
-	    find_result++;
-	}
-	line_num++;
+	        find_result++;
+	    }
+	    line_num++;
 	}
 
 	if(find_result == 0) {
-       	    fclose(fp);
-            return -1;
+       	fclose(fp);
+        return -1;
 	}
 	fclose(fp);
    	return 0;
@@ -221,6 +321,7 @@ int main(){
                 PrintInANewLine("Usuarios", toEncrypt);
                 PrintInANewLine("Usuarios", jumpLine);
 
+                SortingTextFile("Usuarios");
                 strcpy(consoleMessage, "Cadastro concluido!");
                 system("cls");
             }
