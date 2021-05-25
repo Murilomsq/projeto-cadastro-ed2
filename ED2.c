@@ -13,6 +13,40 @@ void encrypt(char *array, int array_size)
 }
 
 
+int DeleteUser(char *fName, int line){
+
+    FILE * fPtr;
+    FILE * fTemp;
+
+    char jumpLine[2] = "\n";
+    char buffer[50];
+    char newline[50];
+    int count;
+
+    fPtr  = fopen(fName, "r");
+    fTemp = fopen("replace.txt", "w");
+
+    count = 0;
+    while ((fgets(buffer, 50, fPtr)) != NULL){
+
+        count++;
+
+        //Imprime todas as linhas no novo arquivo, menos a do usuário a ser deletado
+        if (count != line && count != line + 1 && count != line + 2){
+            fputs(buffer, fTemp);
+        }  
+            
+    }
+    fclose(fPtr);
+    fclose(fTemp);
+
+    remove(fName);
+    rename("replace.txt", fName);
+
+
+    return 0;
+}
+
 int GetNumberOfUsers(char *fName){
 
     FILE* fp;
@@ -328,7 +362,7 @@ int main(){
         }
         else if(strstr(state, "logged")){
             printf("Usuario: %s\n", userName);
-            printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");
+            printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\nDeletar usuario (4)\n");
             do
                 {   
                     scanf("%d", &option);
@@ -336,15 +370,15 @@ int main(){
                     if(option != 1 && option != 2 && option != 3){
                         system("cls");
                         printf("Opcao invalida\n\n");
-                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n"); 
+                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\nDeletar usuario (4)\n");
                     }
 
                     while(getchar() != '\n'){    
                         system("cls");
                         printf("Opcao invalida\n\n");
-                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\n");    
+                        printf("Mudar senha (1)\nMudar nome de usuario (2)\nDeslogar (3)\nDeletar usuario (4)\n");    
                     } }
-                while (option != 1 && option != 2 && option != 3);
+                while (option != 1 && option != 2 && option != 3 && option != 4);
 
             if(option == 1){
                 system("cls");
@@ -352,7 +386,6 @@ int main(){
                 char newPass[50];
                 scanf("%s", newPass);
                 encrypt(newPass, strlen(newPass));
-                strcat(newPass, jumpLine);
                 ReplaceLineWith(lookingAtLine + 1, "Usuarios", newPass);
                 strcpy(consoleMessage, "Senha alterada com sucesso!");
                 system("cls");
@@ -379,6 +412,13 @@ int main(){
                 lookingAtLine = 0;
                 strcpy(state, "logging");
                 strcpy(consoleMessage, "Deslogado com sucesso");
+                system("cls");
+            }
+            else if(option == 4){
+                DeleteUser("Usuarios", lookingAtLine);
+                lookingAtLine = 0;
+                strcpy(state, "logging");
+                strcpy(consoleMessage, "Usuario deletado com sucesso");
                 system("cls");
             }
         }
