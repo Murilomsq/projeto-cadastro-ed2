@@ -5,10 +5,14 @@
 
 void encrypt(char *array, int array_size)
 {
-    int i;
+    int i,j = 0;
     char secret[8] = { 22, 53, 44, 71, 66, 177, 253, 122 };
-    for(i = 0; i < array_size; i++){
-        array[i] ^= secret[i];
+    for(i = 0; i < array_size; i++, j++){
+        if(j < 8){
+            array[i] ^= secret[j];
+            continue;
+        }
+        j -= 8; 
     }
 }
 
@@ -182,6 +186,7 @@ void ReplaceLineWith(int line, char *fName, char *textToReplace){
 
     remove(fName);
     rename("replace.txt", fName);
+    free(newLineCopy);
 }
 
 int CheckForUserPassword(char *fname, char *str, char *consoleMessage, int *line){
