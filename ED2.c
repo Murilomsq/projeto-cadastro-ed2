@@ -11,7 +11,6 @@
 
 //Compilar esse arquivo com um arquivo de texto, no mesmo diretorio, com o nome "Usuarios", pra prevenir bugs e erros
 
-//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,14 +149,13 @@ int UserAtLine(char *fName, char *userName)
 
     if ((fp = fopen(fName, "r")) == NULL)
     {
-        printf("No file found!");
         return -1;
     }
 
     //Procura a String no arquivo
     while (fgets(temp, 512, fp) != NULL)
     {
-        if ((strcmp(temp, userName)) == NULL)
+        if ((strcmp(temp, userName)) == 0)
         {
             break;
         }
@@ -177,7 +175,6 @@ int SearchInFile(char *fname, char *str)
 
     if ((fp = fopen(fname, "r")) == NULL)
     {
-        printf("No file found!");
         return -1;
     }
 
@@ -190,7 +187,7 @@ int SearchInFile(char *fname, char *str)
     //Procura a String no arquivo
     while (fgets(temp, 512, fp) != NULL)
     {
-        if ((strcmp(temp, strCopy)) == NULL)
+        if ((strcmp(temp, strCopy)) == 0)
         {
             find_result++;
         }
@@ -259,8 +256,8 @@ int SortingTextFile(char *fname)
 {
     int numOfUsers = GetNumberOfUsers(fname);
 
-    char userNameList[numOfUsers][30];
-    char userPassList[numOfUsers][30];
+    char userNameList[numOfUsers][50];
+    char userPassList[numOfUsers][50];
     int userArrayAtPos1 = 0, userArrayAtPos2 = 0;
     char buffer[50];
 
@@ -269,7 +266,6 @@ int SortingTextFile(char *fname)
 
     if ((fPtr = fopen(fname, "r")) == NULL)
     {
-        printf("No file found!");
         return -1;
     }
 
@@ -492,7 +488,7 @@ int main()
             {
                 scanf("%d", &option);
 
-                if (option != 1 && option != 2 && option != 3)
+                if (option != 1 && option != 2 && option != 3 && option!= 4 ) 
                 {
                     system("cls");
                     printf("Opcao invalida\n\n");
